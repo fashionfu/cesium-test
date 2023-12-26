@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8" />
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>index-lesson10</title>
+    <script src="../Build/CesiumUnminified/Cesium.js"></script>
+    <style>
+      @import url(../Build/CesiumUnminified/Widgets/widgets.css);
+      html,
+      body,
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    <script>
+      Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlNjhlOTkzMC05YTVlLTRiOGQtODhjYS1hNmE1ODgyMDcwOWYiLCJpZCI6MTcwNTkzLCJpYXQiOjE2OTY3NTE4Nzl9.fFuDq6avrYY-NSIvKUuw6S86liZGXjPA8lNRFT7DY0A';
+      var viewer = new Cesium.Viewer('cesiumContainer');
+  
+      const showTif = async () => {
+        const imageUrl = "C:/Users/10208/Desktop/data/gf7_roi.dat"; // 替换为你的本地影像URL
+        const response = await fetch(imageUrl); 
+
+        const blob = response.originFileObj;
+        const tiff = await fromBlob(blob);
+
+        let image = await tiff.getImage();
+        let [west, south, east, north] = image.getBoundingBox();
+
+        const code = image.geoKeys.ProjectedCSTypeGeoKey || image.geoKeys.GeographicTypeGeoKey;
+
+        const pool = new Pool();
+        // 读取像素信息
+        const [red = [], green = [], blue = []] = await image.readRasters({ pool });
+
+        // const minValue = math.min(...red);  这种方法浏览器会崩溃！！！
+        // const maxValue = math.max(...red);
+        const min = 1000; // 手动设置最小值最大值。
+        const max = 4000;
+        const redArr = red.map(value => Math.round(((value - min) / (max - min)) * 255));
+        const greenArr = green.map(value => Math.round(((value - min) / (max - min)) * 255));
+        const blueArr = blue.map(value => Math.round(((value - min) / (max - min)) * 255));
+
+        // 定义 EPSG32651 和 EPSG4326 的投影信息
+        proj4.defs('EPSG:32651', '+proj=utm +zone=51 +datum=WGS84 +units=m +no_defs');
+        proj4.defs('EPSG:4326', '+proj=longlat +datum=WGS84 +no_defs');
+
+        // 进行坐标转换
+        const utmCoords = [west, south]; // 组合坐标
+        const utmCoords1 = [east, north]; // 组合坐标
+
+        const convertedCoords = proj4('EPSG:32651', 'EPSG:4326', utmCoords);
+        const convertedCoords1 = proj4('EPSG:32651', 'EPSG:4326', utmCoords1);
+
+        // 将像素信息写入canvas
+        const canvas = document.createElement('canvas');
+        let width = image.getWidth();
+        let height = image.getHeight();
+        canvas.width = width;
+        canvas.height = height;
+        let ctx = canvas.getContext('2d');
+        let imageData = ctx.createImageData(width, height);
+
+        console.time('写入像素');
+        for (var i = 0; i < imageData.data.length / 4; i++) {
+          imageData.data[i * 4 + 0] = redArr[i];
+          imageData.data[i * 4 + 1] = greenArr[i] || 0;
+          imageData.data[i * 4 + 2] = blueArr[i] || 0;
+          imageData.data[i * 4 + 3] = 255;
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        console.log('imageData', imageData);
+
+        console.timeEnd('写入像素');
+
+        let rectangle = new Cesium.Rectangle.fromDegrees(...convertedCoords, ...convertedCoords1);
+        let du = canvas.toDataURL();
+        console.log('du', du, rectangle, canvas);
+        viewer.imageryLayers.addImageryProvider(
+          new Cesium.SingleTileImageryProvider({
+            url: du,
+            tileWidth: width,
+            tileHeight: height,
+            ellipsoid: Cesium.Ellipsoid.WGS84,
+            rectangle: rectangle,
+          })
+        );
+        setTimeout(() => {
+          const cameraView = {
+            destination: rectangle,
+            duration: 2.0,
+            maximumHeight: 2000,
+            pitchAdjustHeight: 2000,
+            endTransform: Cesium.Matrix4.IDENTITY,
+          };
+          viewer.camera.flyTo(cameraView);
+        }, 2000);
+      };
+
+    
+    </script>
+  </body>
+</html>

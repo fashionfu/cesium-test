@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8" />
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>index-lesson081-测试08</title>
+    <style>
+      @import url(../Build/CesiumUnminified/Widgets/widgets.css);
+      html,
+      body,
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+    <script src="../Build/CesiumUnminified/Cesium.js">
+    </script>
+    
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    
+    <script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlNjhlOTkzMC05YTVlLTRiOGQtODhjYS1hNmE1ODgyMDcwOWYiLCJpZCI6MTcwNTkzLCJpYXQiOjE2OTY3NTE4Nzl9.fFuDq6avrYY-NSIvKUuw6S86liZGXjPA8lNRFT7DY0A';
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    
+    // var c=document.getElementById("myCanvas");
+    // var ctx=c.getContext("2d");
+    
+    // // 创建渐变
+    // var grd=ctx.createLinearGradient(0,0,200,0);
+    // grd.addColorStop(0,"red");
+    // grd.addColorStop(1,"white");
+    
+    // // 填充渐变
+    // ctx.fillStyle=grd;
+    // ctx.fillRect(10,10,150,80);
+
+  //   //添加物体
+  //   var redWall = viewer.entities.add({
+  //               //Cesium.js库中的方法，用于向场景中添加一个新的实体对象
+  //       name: 'Red wall at height',//name属性用于给实体对象命名
+  //       wall: {
+  //           positions: Cesium.Cartesian3.fromDegreesArrayHeights([
+  //                     //上述方法可将经度、纬度、高度值转换为Cesium的笛卡尔坐标系表示
+  //                   108.9156, 34.2329, 30.0,
+  //                   108.9259, 34.2427, 30.0,
+  //                   108.9356, 34.2529, 30.0,
+  //                   108.9459, 34.2627, 30.0,
+  //                   108.9556, 34.2729, 30.0,
+  //                   108.9659, 34.2827, 30.0,
+  //                   108.9759, 34.2928, 30.0  
+  //           ]),//位置坐标数组，每三个表示一个坐标位置
+  //           minimumHeights: [3000.0, 2000.0, 3000, 2000, 3000, 2000,3000],
+  //           //minimumHeights属性用于指定墙体的最小高度
+  //           material: getColorRamp([0.0, 0.055, 0.2, 0.3, 0.47, 0.64, 1.0],true)
+  //           //上述指定墙体材质的方法调用了getColorRamp的函数，创建一个渐变纹理图作为墙体材质
+  //       }
+  //   });
+
+  // //纹理图绘制
+  //   function getColorRamp(elevationRamp) {
+  //       //函数通过创建一个 <canvas> 元素来准备画布
+  //       var ramp = document.createElement('canvas');
+  //       //然后设置画布的宽度为 1 像素，高度为 100 像素
+  //       ramp.width = 1;
+  //       ramp.height = 100;
+  //       //使用 getContext('2d') 方法获取画布的 2D 渲染上下文，这个上下文将用于绘制图形
+  //       var ctx = ramp.getContext('2d');
+        
+  //       //函数使用传入的elevationRamp参数数组来定义颜色渐变的值
+  //       var values = elevationRamp; 
+  //       //使用createLinearGradient()方法创建一个线性渐变对象grd，指定渐变的起始点和结束点的坐标
+  //       var grd = ctx.createLinearGradient(0, 0, 0, 100);
+  //       //使用addColorStop()方法为渐变对象添加颜色停止点
+  //       //    addColorStop()方法接受两个参数，第一个参数是介于0-1之间的位置值，表示渐变的位置
+  //       //                                   第二个参数是一个表示颜色的字符串
+  //       grd.addColorStop(values[0], '#000000'); //black
+  //       grd.addColorStop(values[1], '#2747E0'); //blue
+  //       grd.addColorStop(values[2], '#D33B7D'); //pink
+  //       grd.addColorStop(values[3], '#D33038'); //red
+  //       grd.addColorStop(values[4], '#FF9742'); //orange
+  //       grd.addColorStop(values[5], '#ffd700'); //yellow
+  //       grd.addColorStop(values[6], '#ffffff'); //white
+  //       //改成 'transparent'可添加透明纹理
+  //       //设置画布的填充样式为渐变对象，使用fillRect()方法绘制一个填充整个画布的矩形
+  //       ctx.fillStyle = grd;
+  //       ctx.fillRect(0, 0, 1, 100);
+  //       return ramp;//函数返回创建的画布元素，以便在函数体外使用
+  //   }
+
+  var yellowLine = viewer.entities.add({
+        name: 'Red line on the surface',
+        polyline: {
+            positions: Cesium.Cartesian3.fromDegreesArray([
+                112.82436,
+                23.071506,
+                112.82742,
+                23.067512,
+                112.828878,
+                23.064659,
+                112.830799,
+                23.060947,
+                112.832166,
+                24.058329
+            ]),
+            width: 2,
+            material: Cesium.Color.YELLOW
+        }
+    });
+
+  viewer.zoomTo(viewer.entities);//要经常记得添加这句，不然视角没法自动位移到创建的实例位置处
+  //lesson06中不需要添加这句是因为本身存在了设置摄像机位置的代码了
+    </script>
+  </body>
+ 
+</html>

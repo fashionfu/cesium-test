@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8" />
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>index-lesson04</title>
+    <script src="../Build/CesiumUnminified/Cesium.js"></script>
+    <style>
+      @import url(../Build/CesiumUnminified/Widgets/widgets.css);
+      html,
+      body, 
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    <script>
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    
+    var newEntity = viewer.entities.add({
+      position:Cesium.Cartesian3.fromDegrees(108.9156, 34.2329, 30.0),
+      box:{
+        dimensions: new Cesium.Cartesian3(40.0,30.0,50.0),
+        material: Cesium.Color.BLUE.withAlpha(0.5),
+        outline: true,
+        outlineColor: Cesium.Color.WHITE
+      }
+    })
+    //注：此处不能够添加;号，不然也不能正常加载？
+    var newEllipse = viewer.entities.add({
+      position:Cesium.Cartesian3.fromDegrees(108.9156, 34.2329, 30.0),
+      ellipse : {
+        semiMinorAxis : 250.0,//短半轴（必写）
+        semiMajorAxis : 400.0,//长半轴（必写）
+        material : Cesium.Color.RED.withAlpha(0.5)//可设置不同的MaterialProperty材质
+      }
+    });
+    //这里忘记了一个;号，导致了加载包含跨域数据的图像元素问题，使得图像元素不能够被正常加载
+    var entity = {
+      position: Cesium.Cartesian3.fromDegrees(108.9196, 34.2329),
+      ellipse: {
+          semiMinorAxis:250.0,
+          semiMajorAxis:400.0,//如果要使用ellipse椭圆形，记得把长短半轴先输好
+          material: new Cesium.StripeMaterialProperty({
+            evenColor: Cesium.Color.WHITE,
+            oddColor: Cesium.Color.BLACK,
+            repeat: 25,
+            offset: 20,
+            orientation: Cesium.StripeOrientation.VERTICAL//垂直方向
+          })
+      }
+    };
+    viewer.entities.add(entity);
+
+    viewer.zoomTo(viewer.entities);
+    </script>
+  </body>
+</html>

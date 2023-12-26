@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8" />
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>index-lesson14-Terrain</title>
+    <script src="../Build/Cesium/Cesium.js"></script>
+    <style>
+      @import url(../Build/Cesium/Widgets/widgets.css);
+      html,
+      body,
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+    
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    <script>
+    
+      Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlNjhlOTkzMC05YTVlLTRiOGQtODhjYS1hNmE1ODgyMDcwOWYiLCJpZCI6MTcwNTkzLCJpYXQiOjE2OTY3NTE4Nzl9.fFuDq6avrYY-NSIvKUuw6S86liZGXjPA8lNRFT7DY0A';
+      Cesium.ArcGisMapService.defaultAccessToken = "AAPK280b1d719b2c458ca3a32858120b64194QY1bpm5A8t3Ev8rTsC3zAhEu942qoEE5-8rWcp8DmEL67HaSsoTB_SEYUcJHBM_";
+
+      const viewer = new Cesium.Viewer("cesiumContainer",{
+        baseLayer :Cesium.ImageryLayer.fromProviderAsync(
+         Cesium.ArcGisMapServerImageryProvider.fromBasemapType(
+           Cesium.ArcGisBaseMapType.SATELLITE
+         )),
+         terrain:Cesium.Terrain.fromWorldTerrain()
+      });
+
+
+    </script>
+  </body>
+</html>

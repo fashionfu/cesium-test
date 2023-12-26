@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8" />
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>index-lesson06</title>
+    <script src="../Build/Cesium/Cesium.js"></script>
+    <style>
+      @import url(../Build/Cesium/Widgets/widgets.css);
+      html,
+      body,
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    <script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlNjhlOTkzMC05YTVlLTRiOGQtODhjYS1hNmE1ODgyMDcwOWYiLCJpZCI6MTcwNTkzLCJpYXQiOjE2OTY3NTE4Nzl9.fFuDq6avrYY-NSIvKUuw6S86liZGXjPA8lNRFT7DY0A';
+    var viewer = new Cesium.Viewer('cesiumContainer');
+    
+    //可以通过每次添加不同实体，完成cesium中的实物创建
+    var redBox = viewer.entities.add({
+      name : 'Red box with black outline',
+      id:123456,
+      position: Cesium.Cartesian3.fromDegrees(108.9156, 34.2329, 30.0),
+      box : {
+        dimensions : new Cesium.Cartesian3(40.0, 30.0, 50.0),
+        material : Cesium.Color.RED.withAlpha(0.5),
+        outline : true,
+        outlineColor : Cesium.Color.BLACK
+    }
+    })
+    
+    var blueBox = viewer.entities.add({
+      name : 'this is a label text',
+      position:Cesium.Cartesian3.fromDegrees(108.9159,34.2327,40.0),
+      label:{
+        text: '西安建筑科技大学',
+        font: ' 18px monopace',
+        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+        outlineWidth: 2,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTON,
+        pixelOffset:new Cesium.Cartesian2(0,-9)
+      }
+    })
+    // viewer.zoomTo(viewer.entities);
+    
+    // viewer.dataSources.add(Cesium.GeoJsonDataSource.load('ne_10m_us_states.topojson'//位置处于同一文件夹下，可以正常加载
+    //   , {
+    //   stroke: Cesium.Color.HOTPINK,
+    //   fill: Cesium.Color.PINK.withAlpha(0.5),
+    //   strokeWidth: 3
+    // }))
+
+    // viewer.camera.setView({//这里之前写错了，应该是setView而非setview，大小写写错了也容易没法正常运行代码
+    //   destination: Cesium.Cartesian3.fromDegrees(108.9156, 34.2329, 100.0),//这一步设置了当前摄像机的位置，和zoomTo的效果其实是一样的
+    //   orientation: {
+    //     heading: Cesium.Math.toRadians(60.0),
+    //     pitch: Cesium.Math.toRadians(-90.0),
+    //     roll: 0.0
+    //   }
+    // });
+    //以上代码可以正常调整camera的x,y,z视角
+
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(108.9156, 32.2829, 100.0),
+      //108.9156, 32.2829, 100.0 安康市蒿坪镇
+      orientation:{
+        heading: Cesium.Math.toRadians(60.0),
+        pitch: Cesium.Math.toRadians(-90.0),
+        roll: 0.0
+      },
+      duration: 5//飞行时间s(秒)，与setView略有不同，但均可以设置飞行目的地及旋转角度
+      //可以带来更好的视觉效果
+    });
+
+    // const center = Cesium.Cartesian3.fromDegrees(108.9156, 34.2329, 100.0);
+    // const heading = Cesium.Math.toRadians(60.0);
+    // const pitch =  Cesium.Math.toRadians(-90.0);
+    // const range = 2500;
+    // viewer.camera.lookAt(center,new Cesium.HeadingPitchRange(heading,pitch,range));
+    // lookAt方法将固定我们的中心点位置，不能通过鼠标活动进行变化，锁定某个场景
+      
+    // const position = Cesium.Cartesian3.fromDegrees(108.9156, 34.2329, 1500);
+    // var orientation = Cesium.Transforms.headingPitchRollQuaternion(position,new Cesium.HeadingPitchRoll(-90,0,0));
+    // var entity =viewer.entities.add({
+    //   position:position,
+    //   orientation:orientation,
+    //   model:{
+    //     URL:"Cesium_Air.glb",
+    //     minimumPixelSize:100,
+    //     maximumScale:10000,
+    //     shou:true
+    //   }
+    // });
+    // viewer.camera.viewBoundingSphere(new Cesium.BoundingSphere(position,20),new Cesium.HeadingPitchRange(0,0,0));
+    //定点漫游，但是没加载出飞机模型..
+
+
+    // viewer.entities.removeById('123456');//实体的ID可以是任何字符串，Cesium不会对ID进行验证或者限制
+    
+    // function onChanged(collection, added, removed, changed){
+    //   var msg = 'Added ids';
+    //   for(var i = 0; i < added.length; i++) {
+    //     msg += '\n' + added[i].id;
+    //   }
+    //   console.log(msg);
+    // }
+    // viewer.entities.collectionChanged.addEventListener(onChanged);
+
+    </script>
+  </body>
+</html>

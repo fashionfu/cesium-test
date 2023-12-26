@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8" />
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>index-lesson10</title>
+    <script src="../Build/CesiumUnminified/Cesium.js"></script>
+    <style>
+      @import url(../Build/CesiumUnminified/Widgets/widgets.css);
+      html,
+      body,
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+    <link rel="shortcut icon" href="#"/>
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    <video id="trailer" style=" display: none;"muted autoplay loop crossorigin controls>
+      <source src="tt.mp4" type="video/mp4">
+      Your browser does not support the <code>video</code> element.
+    </video>
+    <script>
+      Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlNjhlOTkzMC05YTVlLTRiOGQtODhjYS1hNmE1ODgyMDcwOWYiLCJpZCI6MTcwNTkzLCJpYXQiOjE2OTY3NTE4Nzl9.fFuDq6avrYY-NSIvKUuw6S86liZGXjPA8lNRFT7DY0A';
+      var viewer = new Cesium.Viewer('cesiumContainer'
+      // ,{
+      //   imageryProvider : new Cesium.SingleTileImageryProvider({
+      //     URL:'worldimage.jpg'
+      //     // ,
+      //     // tileHeight :0,
+      //     // tileWidth:0
+      //   })
+      // }
+      );
+  
+      var videoElement = document.getElementById('trailer');
+      videoElement.play();
+      var rect = viewer.entities.add({
+        rectangle: {
+            coordinates:Cesium.Rectangle.fromDegrees(-180.0, -90.0, 180.0, 90.0),
+            material: videoElement
+        }
+      });
+      viewer.trackedEntity = rect;
+    
+    
+    </script>
+  </body>
+</html>
