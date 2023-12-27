@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8" />
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>index-lesson15-GeoJson</title>
+    <script src="../Build/Cesium/Cesium.js"></script>
+    <style>
+      @import url(../Build/Cesium/Widgets/widgets.css);
+      html,
+      body,
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+    
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    <script>
+    
+      Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlNjhlOTkzMC05YTVlLTRiOGQtODhjYS1hNmE1ODgyMDcwOWYiLCJpZCI6MTcwNTkzLCJpYXQiOjE2OTY3NTE4Nzl9.fFuDq6avrYY-NSIvKUuw6S86liZGXjPA8lNRFT7DY0A';
+      Cesium.ArcGisMapService.defaultAccessToken = "AAPK280b1d719b2c458ca3a32858120b64194QY1bpm5A8t3Ev8rTsC3zAhEu942qoEE5-8rWcp8DmEL67HaSsoTB_SEYUcJHBM_";
+
+      const viewer = new Cesium.Viewer("cesiumContainer",{
+        baseLayer :Cesium.ImageryLayer.fromProviderAsync(
+         Cesium.ArcGisMapServerImageryProvider.fromBasemapType(
+           Cesium.ArcGisBaseMapType.SATELLITE
+         )),
+         terrain:Cesium.Terrain.fromWorldTerrain() //在加载地形数据后，GeoJson无法贴地，会出现加载不完全的情况，暂时没有找到GeoJson贴地的确切办法
+              //在使用GeoJsonDataSource.load时，需要设置clampToGround为true（即设置面数据贴地），这时，加载地形数据的同时可以实现贴地操作
+        });
+
+      var promise=Cesium.GeoJsonDataSource.load('guangzhou.json',{
+            clampToGround:true
+      })
+        promise.then((datasource) => {
+            viewer.dataSources.add(datasource);
+            var entities = datasource.entities.values;
+            for (var i = -1; i < entities.length; i++){//这里的i要从-1开始，很奇怪这json文件居然不从0开始
+              var entity = entities[i];
+              entity.polygon.material = Cesium.Color.RED;
+              entity.polygon.extrudedHeight = 100;
+              entities.polygon.material= getColorRamp();
+            }
+        })
+
+      viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(113.53738,22.294531, 315500),
+            orientation: {
+                heading: Cesium.Math.toRadians(0.0),
+                pitch: Cesium.Math.toRadians(-75.0),
+                roll: 0.0
+            },
+            duration: 5
+        });
+
+     function getColorRamp(rampColor,centerColor) {
+          var ramp = document.createElement("canvas");
+          ramp.width = 50;
+          ramp.height = 50;
+          var ctx = ramp.getContext("2d");
+
+          var grd = ctx.createRadialGradient(25, 25, 0, 25, 25, 50);
+          grd.addColorStop(0, centerColor); // "rgba(255,255,255,0)"
+          grd.addColorStop(1, rampColor);
+
+          ctx.fillStyle = grd;
+          ctx.fillRect(0, 0, 50, 50);
+
+          // return ramp;
+
+          return new Cesium.ImageMaterialProperty({
+            image: ramp,
+            transparent: true
+          });
+      }
+
+      handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+      handler.setInputAction((e) => {
+        var pick = viewer.scene.pick(e.position);
+        if (Cesium.defined(pick) && pick.id) {
+          var feature = pick.id;
+          viewer.entities.removeById("select_grid");
+          viewer.entities.removeById(`line_${feature.id}`);
+          let positions = feature.polygon.hierarchy.getValue(
+              Cesium.JulianDate.now()
+          ).positions;
+          viewer.entities.add({
+            id: "select_grid",
+            polygon: {
+              hierarchy: positions,
+              material: this.getColorRamp(
+                "rgba(0, 255, 255,1)",
+                "rgba(255,0,0,0.3)"
+              ),
+              // height: 499,
+              classificationType: Cesium.ClassificationType.BOTH, //设置面贴地后，可以显示类似半透明的效果，估计是颜色调出来的
+            },
+          });
+        }
+      }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+      handler.setInputAction((movement) => {
+          var pickFeature =
+            viewer.scene.pick(movement.endPosition) &&
+            viewer.scene.pick(movement.endPosition).id;
+          if (Cesium.defined(pickFeature) && this.preLineId !== pickFeature.id) {
+            this.preLineId &&viewer.entities.removeById(`line_${this.preLineId}`);
+            this.preLineId = pickFeature.id;
+            viewer.entities.add({
+              id: "line_" + pickFeature.id,
+              name: "line_" + pickFeature.name,
+              polyline: {
+                  positions: pickFeature.polygon.hierarchy.getValue(
+                    Cesium.JulianDate.now()
+                  ).positions,
+                  width: 8,
+                  material: new Cesium.PolylineGlowMaterialProperty({
+                    // 尾迹线材质，这里我设置成了发光材质，原PolylineTrailMaterialProperty已经不能正常使用了，只能使用发光材质：PolylineGlowMaterialProperty
+                    color: Cesium.Color.AQUA,
+                    trailLength: 0.9,
+                    period: 1,
+                  }),
+                  clampToGround:true,//要设置线贴地效果，不是设置在material的材质中的
+              },
+            });
+          } else {
+            this.preLineId && viewer.entities.removeById(`line_${this.preLineId}`);
+            this.preLineId = null;
+          }
+      }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+
+
+    </script>
+  </body>
+</html>
